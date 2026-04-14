@@ -17,7 +17,8 @@ st.markdown(
     """
     <style>
     .block-container {
-        padding-top: 1.75rem;
+        padding-top: 1.0rem;
+        padding-bottom: 1.0rem;
     }
 
     div[data-baseweb="select"] span[data-baseweb="tag"] {
@@ -392,7 +393,7 @@ def make_figure(df, compound, selected_samples, metric):
 
     fig.update_layout(
         template="plotly_white",
-        margin=dict(l=55, r=55, t=145, b=75),
+        margin=dict(l=55, r=55, t=125, b=75),
         height=520,
         legend=dict(
             title_text="Displayed traces",
@@ -407,7 +408,7 @@ def make_figure(df, compound, selected_samples, metric):
 
     fig.add_annotation(
         x=0.5,
-        y=1.20,
+        y=1.26,
         xref="paper",
         yref="paper",
         text=f"<b>{build_figure_title(compound, selected_samples)}</b>",
@@ -456,7 +457,7 @@ with c1:
     compound = st.selectbox("Compound", compound_options)
 
 with c2:
-    metric = st.selectbox("Metric", ["peak_area", "peak_area_top3"], index=1)
+    metric = st.selectbox("Metric", ["peak_area", "peak_area_top3", "peak_max"], index=1)
 
 sample_options = get_samples(df, compound)
 
@@ -475,5 +476,11 @@ if not selected_samples:
 fig = make_figure(df, compound, selected_samples, metric)
 st.plotly_chart(fig, width="stretch")
 
+preview_df = df[
+    (df["peak_label"].astype(str) == str(compound))
+    & (df["ms_file_label"].astype(str).isin([str(sample) for sample in selected_samples]))
+].copy()
+
 with st.expander("Preview data"):
-    st.dataframe(df.head(50), width="stretch")
+    st.caption("Rows matching the selected compound and samples.")
+    st.dataframe(preview_df.head(50), width="stretch")
